@@ -1,0 +1,266 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5652f5e1-e0ea-4b5a-9ed3-386ce6b00edc",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Replace your gmail id auth.",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dc8dd557-22e3-48b9-acfd-fd060bd0ffba",
+              "name": "From",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "a9f3adb6-0ee9-4a76-b2de-8a5965c3878a",
+              "name": "To",
+              "value": "={{ $json.To }}",
+              "type": "string"
+            },
+            {
+              "id": "7c6fb4d3-3583-4d1f-89be-ddb9d68ae302",
+              "name": "Subject",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "473daddd-6674-4894-a564-65b1c4fe99b0",
+              "name": "snippet",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        0
+      ],
+      "id": "fb19a627-80b4-4757-a6b9-f7c64d181b6c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an intelligent email assistant. Analyze the email content and determine if it's about an event, meeting, or appointment. If it is:\n1. Extract event details (title, date, time, duration)\n2. Check my calendar availability for that time using the calendar tool\n3. If I am available: Create the event in my calendar\n4. If I am busy: Send a polite email reply to the sender explaining I'm busy at that time and suggest they book at a different time\n\nEmail From: {{ $json.From }}\nEmail Subject: {{ $json.Subject }}\nEmail Content: {{ $json.snippet }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "f4f0a43d-01c1-43f4-b701-c747f9238fb5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        752,
+        240
+      ],
+      "id": "1088472d-82c8-4af1-8b02-58544eb4c7db",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Replace your gmail APi id auth.",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "Replace your Gmail id",
+          "mode": "list",
+          "cachedResultName": "Replace your Gmail id"
+        },
+        "start": "={{ $fromAI('start_time') }}",
+        "end": "={{ $fromAI('end_time') }}",
+        "additionalFields": {
+          "description": "={{ $fromAI('event_description', 'Description of the event', 'string', '') }}",
+          "summary": "={{ $fromAI('event_title', 'The title or summary of the event', 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        928,
+        240
+      ],
+      "id": "0709fc88-5086-438d-8e5c-cce2b0c33965",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Calender Auth. id",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('recipient_email', 'Email address of the person to reply to', 'string') }}",
+        "subject": "={{ $fromAI('reply_subject', 'Subject line for the reply email', 'string') }}",
+        "message": "={{ $fromAI('reply_message', 'The message content explaining unavailability', 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1088,
+        240
+      ],
+      "id": "2de7bd33-f725-4b7f-ac66-9e735df22e13",
+      "name": "Send a message in Gmail",
+      "webhookId": "28cef9e4-11ca-40fe-9122-1fd31888d0ce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Gmail Auth. id",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "primary"
+        },
+        "timeMin": "={{ $fromAI('start_time', 'Start time to check availability', 'string') }}",
+        "timeMax": "={{ $fromAI('end_time', 'End time to check availability', 'string') }}",
+        "options": {}
+      },
+      "id": "395b2653-243c-4ad2-b771-3c418e478c52",
+      "name": "Check Calendar Availability",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1264,
+        240
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Calender Auth. id",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Calendar Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e54ff85-4887-4af3-addd-6974e7b8a618",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f97f992aa3887c0942a94fb82503b009fb8843c04ad8d47a8826e9381d5e2d2e"
+  },
+  "id": "aTgyoHomDfuZs87n",
+  "tags": []
+}
