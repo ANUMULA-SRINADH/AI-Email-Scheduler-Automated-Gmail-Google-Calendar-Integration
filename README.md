@@ -17,7 +17,8 @@ Node	Description
 💬 Google Gemini Chat Model	Provides the natural-language understanding and reasoning power for the AI Agent.
 📅 Google Calendar Tools	Used for two operations — checking calendar availability and creating new events automatically.
 ✉️ Gmail Tool	Sends email replies when the user’s calendar slot is already booked, ensuring professional communication.
-🧩 Workflow Architecture
+🧩 Workflow Architecture:-
+
                                                               [Gmail Trigger]
                                                                     ↓
                                                                [Edit Fields]
@@ -27,6 +28,7 @@ Node	Description
                                                               [Check Calendar] [Create Event] [Send Gmail Reply]
                                                                       ↓             ↓              ↓
                                                                  (Decision)    (Add to Calendar)  (Inform Sender)
+                                                                 
 
 💡 How It Works
 
