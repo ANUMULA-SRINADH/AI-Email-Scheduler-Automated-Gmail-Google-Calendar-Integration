@@ -10,13 +10,21 @@ Whenever a new email arrives, the system automatically analyzes its content to d
 This automation removes the manual hassle of scheduling and replying to meeting requests.
 
 ⚙️ Key Components
+
 Node	Description
+
 📩 Gmail Trigger	Detects new incoming emails in real time and starts the workflow.
+
 🧩 Edit Fields (Set Node)	Extracts important email fields — sender, subject, and snippet — for the AI to process.
+
 🧠 AI Agent (LangChain Agent)	Acts as the intelligent assistant. It interprets the email content, extracts event details, checks availability, and decides the next action.
+
 💬 Google Gemini Chat Model	Provides the natural-language understanding and reasoning power for the AI Agent.
+
 📅 Google Calendar Tools	Used for two operations — checking calendar availability and creating new events automatically.
+
 ✉️ Gmail Tool	Sends email replies when the user’s calendar slot is already booked, ensuring professional communication.
+
 🧩 Workflow Architecture:-
 
                                                               [Gmail Trigger]
